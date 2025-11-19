@@ -16,4 +16,12 @@ applicationRouter.post(
   applyJob,
 );
 
+applicationRouter.post(
+  "/api/job/test/:id",
+  authenticateJWT,
+  authenticateRole("Employee"),
+  upload.single("resume"),
+  checkScore
+);
+
 module.exports = applicationRouter

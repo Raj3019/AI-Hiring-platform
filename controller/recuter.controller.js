@@ -51,7 +51,7 @@ const loginRecuter = async (req, res) => {
       return res.status(401).json({message: "Invalid creds"})
     }
     
-    const isPasswordValid = bcrypt.compare(recuter.password, password)
+    const isPasswordValid = await bcrypt.compare(password, recuter.password)
     
     if(!isPasswordValid){
       return res.status(401).json({message: "Invalid creds"})
@@ -98,7 +98,7 @@ const editRecuter = async (req, res) => {
       req.body.password = await bcrypt.hash(req.body.password, 10)
     }
   
-    const recuter = await Recuter.findOneAndUpdate(recuterId.id, req.body, {new: true}).select('-password')
+    const recuter = await Recuter.findOneAndUpdate(recuterId, req.body, {new: true}).select('-password')
     
     if(!recuter){
       return res.status(401).json({message: "Invalid profile"})
