@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
 const connectToDB = require('./database/config.database')
 require('dotenv').config()
 const Port = process.env.PORT
@@ -11,6 +12,13 @@ const applicationRouter = require("./routers/application.router")
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+
+app.use(cors({
+  origin:[
+    'http://localhost:3001'
+  ]
+}))
+
 app.use('/', employeeRouter)
 app.use('/', recuterRoute)
 app.use('/', jobRouter)

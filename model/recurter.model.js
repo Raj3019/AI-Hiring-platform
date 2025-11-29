@@ -15,32 +15,142 @@ const recurterSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    password:{
-      type: String
+    profilePicture: {
+      type: String,
+    },
+    password: {
+      type: String,
     },
     phone: {
       type: String,
       required: [true, "Phone Number is required"],
       maxlength: 10,
     },
-    age: {
-      type: Number,
-      required: [true, "Age is required"],
-      min: 18,
+    dateOfBirth: {
+      type: Date,
     },
-    role:{
+    currentCity: {
       type: String,
-      default: "Recuter"
+    },
+    area: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    country: {
+      type: String,
+      default: "India",
+    },
+    zipCode: {
+      type: String,
+    },
+    about: {
+      type: String,
+    },
+    role: {
+      type: String,
+      default: "Recuter",
     },
     gender: {
       type: String,
       enum: ["Male", "Female"],
       required: true,
     },
-    location: {
-      type: String,
-      required: [true, "Location is required"],
+    education: {
+      tenth: {
+        schoolName: String,
+        board: {
+          type: String,
+          enum: ["CBSE", "ICSE", "State Board", "Other"],
+        },
+        percentage: Number,
+        grade: String,
+        passingYear: Number,
+        city: String,
+        state: String,
+      },
+      juniorCollege: {
+        collegeName: String,
+        board: {
+          type: String,
+          enum: ["CBSE", "ICSE", "State Board", "Other"],
+        },
+        stream: {
+          type: String,
+          enum: ["Science", "Commerce", "Arts", "Other"],
+        },
+        percentage: Number,
+        grade: String,
+        passingYear: Number,
+        city: String,
+        state: String,
+      },
+      graduation: {
+        collegeName: String,
+        university: String,
+        degree: {
+          type: String,
+        },
+        specialization: String,
+        percentage: Number,
+        cgpa: Number,
+        passingYear: Number,
+        city: String,
+        state: String,
+      },
+      postGraduation: {
+        collegeName: String,
+        university: String,
+        degree: {
+          type: String,
+        },
+        specialization: String,
+        percentage: Number,
+        cgpa: Number,
+        passingYear: Number,
+        city: String,
+        state: String,
+      },
+      phd: {
+        university: String,
+        fieldOfStudy: String,
+        thesisTitle: String,
+        year: Number,
+      },
     },
+    workExperience: [
+      {
+        jobTitle: String,
+        company: String,
+        location: String,
+        startDate: Date,
+        endDate: Date,
+        currentlyWorking: {
+          type: Boolean,
+          default: false,
+        },
+        description: String,
+      },
+    ],
+    languages: [
+      {
+        language: String,
+        proficiency: {
+          type: String,
+          enum: ["Beginner", "Intermediate", "Advanced", "Native"],
+        },
+      },
+    ],
+    certifications: [
+      {
+        name: String,
+        issuingOrganization: String,
+        issueDate: Date,
+        expiryDate: Date,
+        credentialURL: String,
+      },
+    ],
     currentRole: {
       type: String,
       required: true,
@@ -52,12 +162,43 @@ const recurterSchema = new mongoose.Schema(
     companyURL: {
       type: String,
     },
-    jobs:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Job"
-    }]
+    totalHires: {
+      type: Number,
+      default: 0,
+    },
+    socials: {
+      linkedin: String,
+      twitter: String,
+    },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "suspended"],
+      default: "active",
+    },
+    resumeFileURL: {
+      type: String,
+    },
+    portfolioUrl: {
+      type: String,
+    },
+    linkedinUrl: {
+      type: String,
+    },
+    githubUrl: {
+      type: String,
+    },
+    preferences: {
+      industries: [String],
+      jobTypes: [String],
+    },
+    jobs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Job",
+      },
+    ],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const RecurterModel = mongoose.model("Recuter", recurterSchema);

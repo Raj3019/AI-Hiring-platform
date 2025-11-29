@@ -1,5 +1,6 @@
 const Employee = require("../model/employee.model.js");
 const Application = require("../model/application.model.js");
+const {EmployeeRegisterValidation, EmployeeLoginValidation, EmployeeSetupValidation} = require("../utils/validation.utlis.js")
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
@@ -8,19 +9,17 @@ const jwtToken = process.env.JWT_TOKEN_Secret
 
 const registerEmployee = async (req, res) => {
   try {
+    
+    const validateBody = EmployeeRegisterValidation.safeParse(req.body)
+    
+    if(!validateBody.success){
+      return res.status(400).json({error: validateBody.error})
+    }
+    
     const {
-      fullName,
-      about,
       email,
-      role,
-      password,
-      phone,
-      location,
-      skills,
-      experienceYears,
-      resumeFileURL,
-      portfolioUrl,
-    } = req.body;
+      password
+    } = validateBody.data;
     
     const passwordHash = await bcrypt.hash(password, 10)
     const checkEmail = await Employee.findOne({ email })
@@ -28,23 +27,14 @@ const registerEmployee = async (req, res) => {
       return res.status(409).json({ error: "Employee with this email already exists" });
     }
     const employee = new Employee({
-      fullName,
-      about,
       email,
-      role,
       password: passwordHash,
-      phone,
-      location,
-      skills,
-      experienceYears,
-      resumeFileURL,
-      portfolioUrl,
     })
     
     await employee.save()
-    res.status(200).json({ "message": "Employee sucessfully created" })
+    const token = jwt.sign({id: employee._id, role: employee.role}, jwtToken, {expiresIn: "1hr"})
+    res.status(200).json({ "message": "Employee sucessfully created" , token})
   } catch (error) {
-    
     console.log(error)
     res.status(400).send(`Error: ${error}`)
   }
@@ -53,7 +43,14 @@ const registerEmployee = async (req, res) => {
 
 const loginEmployee = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    
+    const validateBody = EmployeeLoginValidation.safeParse(req.body)
+    
+    if(!validateBody.success){
+      return res.status(400).json({error: validateBody.error})
+    }
+    
+    const { email, password } = validateBody.data;
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
@@ -72,13 +69,43 @@ const loginEmployee = async (req, res) => {
     }
 
     const token = jwt.sign({id: employee._id, role: employee.role}, jwtToken, {expiresIn: "1hr"})
-    return res.status(200).json({ message: "Login Successful" , data: token});
+    return res.status(200).json({ message: "Login Successful" , token});
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Login Error" });
   }
 };
+
+const setupEmployee = async(req, res) => {
+  try {
+
+    const employeeId = req.user.id
+    const validateBody = EmployeeSetupValidation.safeParse(req.body)
+
+    
+    if(!validateBody.success){
+      return res.status(400).json({error: validateBody.error})
+    }
+
+    const updateData = req.body
+
+    const employee = await Employee.findByIdAndUpdate(employeeId, {$set: updateData}, {new: true})
+
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    await employee.save();
+
+    res.status(200).json({message: "Setup Done Sucessfully"})
+
+  } catch (err) {
+    console.log(err)
+    return res.status(401).josn({message: "Unable to setup employee"})
+  }
+}
+
 
 const profileEmployee = async (req, res) => {
   try{
@@ -179,6 +206,7 @@ const employeeDashboard = async(req, res) => {
 module.exports = {
   registerEmployee,
   loginEmployee,
+  setupEmployee,
   profileEmployee,
   editEmployee,
   uploadResume,

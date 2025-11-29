@@ -4,12 +4,20 @@ const jwt = require("jsonwebtoken")
 const jwtToken = process.env.JWT_TOKEN_Secret
 const bcrypt = require('bcryptjs');
 const Job = require('../model/job.model')
+const {RecurterRegisterValidation, RecurterLoginValidation} = require('../utils/validation.utlis')
 // const salt = process.env.SALT
 
 //Register Controller
 const registerRecuter = async (req, res) => {
   try{
-    const { fullName, email, role, password, phone, age, gender, location, currentRole, currentEmployer, companyURL } = req.body;
+    
+    const validateBody = RecurterRegisterValidation.safeParse(req.body)
+    
+    if(!validateBody.success){
+      return res.status(400).json({error: validateBody.error})
+    }
+    
+    const { fullName, email, role, password, phone, age, gender, location, currentRole, currentEmployer, companyURL } = validateBody.data;
     
     const existingEmail = await Recuter.findOne({email})
     
@@ -43,7 +51,14 @@ const registerRecuter = async (req, res) => {
 //Login Controller
 const loginRecuter = async (req, res) => {
   try{
-    const { email, password } = req.body;
+    
+    const validateBody = RecurterLoginValidation.safeParse(req.body)
+    
+    if(!validateBody.success){
+      return res.status(400).json({error: validateBody.error})
+    }
+    
+    const { email, password } = validateBody.data;
     
     const recuter = await Recuter.findOne({email})
     
