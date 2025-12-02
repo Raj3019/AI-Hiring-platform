@@ -5,8 +5,7 @@ const mongoose = require('mongoose')
 
 const employeeSchema = new mongoose.Schema({
 	fullName: {
-		type: String,
-		required: [true, "Full Name is required"]
+		type: String
 	},
 	about: {
 		type: String,
@@ -14,22 +13,23 @@ const employeeSchema = new mongoose.Schema({
 	email: {
 		type: String,
 		lowercase: true,
-		unique: true,
-		required: [true, "email is required"]
+		unique: true
 	},
 	password: {
 		type: String,
-		required: [true, "Password is required"]
 	},
 	phone: {
 		type: String,
-		required: [true, "Phone Number is required"],
 		maxlength: 10,
-		unique: true
+		unique: true,
+		sparse: true 
 	},
 	profilePicture: {
 		type: String,
 	},
+	profilePicturePublicId: {
+        type: String,
+    },
 	currentCity: {
 		type: String,
 	},
@@ -181,6 +181,9 @@ const employeeSchema = new mongoose.Schema({
 		},
 	},
 	resumeFileURL: {
+		type: String,
+	},
+	resumePublicLinkId: {
 		type: String,
 	},
 	portfolioUrl: {

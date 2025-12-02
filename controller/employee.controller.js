@@ -1,9 +1,10 @@
 const Employee = require("../model/employee.model.js");
 const Application = require("../model/application.model.js");
 const {EmployeeRegisterValidation, EmployeeLoginValidation, EmployeeSetupValidation} = require("../utils/validation.utlis.js")
-
+const fs = require("fs");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { deleteFromCloudinary, uploadToCloudinary, deleteResumeFromCloudinary, uploadResumeToCloudnary } = require("../utils/cloudnary.utlis.js");
 const jwtToken = process.env.JWT_TOKEN_Secret
 // const salt = process.env.SALT
 
@@ -77,6 +78,73 @@ const loginEmployee = async (req, res) => {
   }
 };
 
+
+const uploadProfilePicture = async (req, res) => {
+  try {
+    if(!req.file){
+      return res.status(400).json({message: 'No file Uploaded'})
+    }
+
+    const employeeId = req.user.id
+    const employee = await Employee.findById(employeeId);
+
+    if(employee.profilePicturePublicId){
+      await deleteFromCloudinary(employee.profilePicturePublicId)
+    }
+
+    const result = await uploadToCloudinary(req.file.path)
+
+    employee.profilePicture = result.url;
+    employee.profilePicturePublicId = result.public_id
+    await employee.save();
+
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).json({
+      message: "Profile picture uploaded sucessfully",
+      profilePicture: result.url
+    })
+
+  } catch (error) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
+const uploadResume = async(req, res) => {
+  try {
+    const employeeId = req.user.id
+    const employee = await Employee.findById(employeeId)
+
+    if(employee.resumePublicLinkId){
+      await deleteResumeFromCloudinary(employee.resumePublicLinkId)
+    }
+
+    const result = await uploadResumeToCloudnary(req.file.path)
+
+    employee.resumeFileURL = result.url
+    employee.resumePublicLinkId = result.public_id
+    await employee.save();
+
+    fs.unlinkSync(req.file.path)
+
+    res.status(200).json({
+      message: "Resume Uploaded Successfully",
+      resumeLink: result.url
+    })
+  } catch (error) {
+    if(req.file && fs.existsSync(req.file.path)){
+      fs.unlinkSync(req.file.path);
+    }
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 const setupEmployee = async(req, res) => {
   try {
 
@@ -105,7 +173,6 @@ const setupEmployee = async(req, res) => {
     return res.status(401).josn({message: "Unable to setup employee"})
   }
 }
-
 
 const profileEmployee = async (req, res) => {
   try{
@@ -144,23 +211,23 @@ const editEmployee = async(req, res) => {
   }
 } 
 
-const uploadResume = async(req, res) => {
-  try{
-    const employeeId = req.params.id
+// const uploadResume = async(req, res) => {
+//   try{
+//     const employeeId = req.params.id
     
-    if(!employeeId){
-      res.status(404).json({message: "Employee not found"})
-    }
+//     if(!employeeId){
+//       res.status(404).json({message: "Employee not found"})
+//     }
     
-    if (!req.file) {
-          return res.status(400).json({ message: 'No file uploaded' });
-    }
+//     if (!req.file) {
+//           return res.status(400).json({ message: 'No file uploaded' });
+//     }
     
-    res.status(201).json({message:"Uploaded Successfully", file: req.file})
-  }catch(err){
-    return res.status(401).json({message: "Unable to upload resume"})
-  }
-}
+//     res.status(201).json({message:"Uploaded Successfully", file: req.file})
+//   }catch(err){
+//     return res.status(401).json({message: "Unable to upload resume"})
+//   }
+// }
 
 const employeeDashboard = async(req, res) => {
   try{
@@ -210,6 +277,7 @@ module.exports = {
   profileEmployee,
   editEmployee,
   uploadResume,
+  uploadProfilePicture,
   employeeDashboard
   // logoutEmployee
 }
