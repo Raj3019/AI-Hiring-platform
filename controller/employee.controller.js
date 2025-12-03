@@ -207,6 +207,7 @@ const editEmployee = async(req, res) => {
     return res.status(200).json({data: employee, message: "Employee updated sucessfully"})
     
   }catch(err){
+    console.log(err)
     res.status(401).json({message: "Unable to update employee"})
   }
 } 

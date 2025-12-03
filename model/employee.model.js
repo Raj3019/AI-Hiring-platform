@@ -24,6 +24,10 @@ const employeeSchema = new mongoose.Schema({
 		unique: true,
 		sparse: true 
 	},
+	gender:{
+		type: String,
+		enum: ["Male", "Female", "Other"],
+	},
 	profilePicture: {
 		type: String,
 	},
