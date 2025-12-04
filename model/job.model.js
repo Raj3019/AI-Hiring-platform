@@ -15,6 +15,18 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: [true, "Location is required"]
   },
+  workType:{
+    type: String,
+    enum: ["Remote", "On-site", "Hybrid"],
+    required: [true, "Work Type is required"]
+  },
+  companyName:{
+    type: String,
+    required: [true, "Company Name is required"]
+  },
+  department:{
+    type: String
+  },
   skillsRequired: {
     type: [String],
     required:[true, "Skill is required"]
@@ -23,8 +35,12 @@ const jobSchema = new mongoose.Schema({
     type: String
   },
   salary:{
-    type:Number,
-    required: [true, "Salary is required"]
+    min:{type: Number, required: [true, "Minimum Salary is required"]},
+    max:{type: Number, required: [true, "Maximum Salary is required"]},
+    currency: {
+      type: String,
+      default: "INR"
+    }
   },
   postedBy:{
     type: mongoose.Schema.Types.ObjectId,
@@ -35,7 +51,7 @@ const jobSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employee"
   }
-})
+},{ timestamps: true })
 
 const Job = mongoose.model("Job", jobSchema)
 

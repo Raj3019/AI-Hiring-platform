@@ -7,13 +7,16 @@ const createJob = async (req, res) => {
     const recuter = req.user;
     // console.log(recuter)
     
-    const {title, description, location, skillsRequired, experienceLevel, salary, postedBy} = req.body
+    const {title, description, location,companyName, department, workType, skillsRequired, experienceLevel, salary, postedBy} = req.body
     
     const job = new Job(
       {
         title,
         description,
         location,
+        companyName,
+        department,
+        workType,
         skillsRequired,
         experienceLevel,
         salary,

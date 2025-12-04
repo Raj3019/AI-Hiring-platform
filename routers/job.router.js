@@ -9,7 +9,7 @@ const jobRouter = express.Router()
 jobRouter.post('/api/job/create', authenticateJWT, authenticateRole("Recuter"), createJob)
 
 //Get Jobs
-jobRouter.get('/api/jobs', authenticateJWT, authenticateRole("Employee"), listJobs)
+jobRouter.get('/api/jobs', authenticateJWT, listJobs)
 
 //Get Job [id]
 jobRouter.get('/api/job/:id', authenticateJWT, authenticateRole("Employee"), getJobById)
