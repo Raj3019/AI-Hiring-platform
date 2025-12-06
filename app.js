@@ -33,6 +33,15 @@ app.get('/', (req, res) => {
 //   console.log(`Server is running on http://localhost:${Port}`)
 // })
 
+// Add multer error handler AFTER all routes
+app.use((err, req, res, next) => {
+  console.log('Error caught:', err);
+  if (err.message) {
+    return res.status(400).json({ message: err.message });
+  }
+  return res.status(500).json({ message: 'Something went wrong!' });
+});
+
 connectToDB().then(() => {
   console.log("Database connection established...")
   app.listen(process.env.PORT, () => {

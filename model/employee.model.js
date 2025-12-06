@@ -67,6 +67,10 @@ const employeeSchema = new mongoose.Schema({
 		type: [String],
 		default: []
 	},
+	role: {
+    	type: String,
+    	default: "Employee"
+  	},
 	education: {
 		tenth: {
 			schoolName: String,
@@ -202,7 +206,7 @@ const employeeSchema = new mongoose.Schema({
 	appliedJobs: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Job",
+			ref: "Application",
 		},
 	],
 }, { timestamps: true })

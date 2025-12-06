@@ -1,5 +1,6 @@
 const Employee = require("../model/employee.model.js");
 const Application = require("../model/application.model.js");
+const Job = require("../model/job.model.js")
 const {EmployeeRegisterValidation, EmployeeLoginValidation, EmployeeSetupValidation} = require("../utils/validation.utlis.js")
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
@@ -179,12 +180,15 @@ const profileEmployee = async (req, res) => {
     const user = req.user
     console.log(user.id)
     
-    const employee = await Employee.findById(user.id).select('-password');
-    // console.log(employee)
+    const employee = await Employee.findById(user.id).select('-password')
     if (!employee){
       return res.status(401).json({message: "Employee with this id not found"})
-    } 
-    return res.status(200).json({data: employee})
+    }
+    // const appliedJob = employee.appliedJobs
+    const recentApplication = await Application.findOne({JobSeeker: user.id}).sort({appliedAt: -1}).populate('job')
+    
+    const recentApplicationJob = recentApplication ? recentApplication : null
+    return res.status(200).json({data: employee, recentApplicationJob})
   }catch(err){
     return res.status(401).json({message: "Employee profile not found"})
   }

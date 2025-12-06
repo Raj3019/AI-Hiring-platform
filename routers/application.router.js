@@ -6,7 +6,8 @@ const {
 } = require("../middleware/auth.middleware");
 const {applyJob, checkScore} = require("../controller/application.controller");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+// const upload = require("../middleware/multer.middleware");
+const upload = multer({ dest: 'resume/' , limits: { fileSize: 5 * 1024 * 1024 }})
 
 applicationRouter.post(
   "/api/job/:id",

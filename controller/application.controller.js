@@ -5,6 +5,8 @@ const { PDFParse } = require('pdf-parse');
 const fs = require('fs').promises;
 const Groq = require('groq-sdk')
 const GroqApiKey = process.env.GROQAPIKEY
+const {uploadResumeToCloudnary } = require("../utils/cloudnary.utlis.js");
+const Employee = require("../model/employee.model.js");
 
 
 // Applie for Job By  Employee
@@ -20,22 +22,42 @@ const applyJob = async (req, res) => {
           return res.status(404).json({ message: "Job not found" })
     }
     const recuterId = jobById.postedBy
-    
+
+    const existingApplication = await Application.findOne({
+      job: jobId,
+      JobSeeker: employeeId
+    })
+
+    if (existingApplication) {
+      return res.status(400).json({ 
+        message: "You have already applied to this job" 
+      });
+}
     //Get resume file path
-    const resumePath = req.file ? req.file.path: null
+    // const resumePath = req.file ? req.file.path: null
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Resume file is required" });
+    }
     
+    const cloudinaryResult = await uploadResumeToCloudnary(req.file.path);
+
     const applyForJob = new Application({
       job: jobById._id,
       JobSeeker: employeeId,
       postedBy: recuterId,
-      resume: resumePath,
+      resume: cloudinaryResult.url,
     })
     await applyForJob.save()
+    const updateEmployee = await Employee.findById(employeeId)
+    updateEmployee.appliedJobs.push(applyForJob._id)
+    await updateEmployee.save()
+
     return res.status(200).json({data: applyForJob, message:"Applied for Job successfully"})
     
   }catch(err){
     console.log(err)
-    return res.status(401).json("Job you are apply is not found")
+    return res.status(500).json("Job you are apply is not found")
   }
 }
 
@@ -51,9 +73,14 @@ const checkScore = async(req, res) => {
     //when employee is on job page the job description and resume both should go 
     // to ai
     const employeeResume = req.file;
+    if (!employeeResume) {
+      return res.status(400).json({ 
+        message: "No resume file uploaded. Please upload a PDF or DOC file." 
+      });
+    }
     // console.log(employeeResume)
     const jobId = req.params.id;
-    
+    console.log(jobId)
     const resumeBuffer = await fs.readFile(employeeResume.path);
     console.log(resumeBuffer)
     const parser = new PDFParse({ data: resumeBuffer });
@@ -101,13 +128,13 @@ const checkScore = async(req, res) => {
     const aiReply = chatCompletion.choices[0]?.message?.content;
         console.log('Groq reply:', aiReply);
     
-    return res.status(200).json({jobId: jobId, message: aiReply})
+    return res.status(200).json({message: aiReply})
     
     // give me to groq ai
     // score by some cretia
   }catch(err){
     console.log(err)
-    return res.status(401).json({message: "Unable to Score Your resume"})
+    return res.status(500).json({message: "Unable to Score Your resume"})
   }
 }
 
