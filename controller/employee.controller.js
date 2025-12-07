@@ -185,7 +185,7 @@ const profileEmployee = async (req, res) => {
       return res.status(401).json({message: "Employee with this id not found"})
     }
     // const appliedJob = employee.appliedJobs
-    const recentApplication = await Application.findOne({JobSeeker: user.id}).sort({appliedAt: -1}).populate('job')
+    const recentApplication = await Application.find({JobSeeker: user.id}).sort({appliedAt: -1}).populate('job')
     
     const recentApplicationJob = recentApplication ? recentApplication : null
     return res.status(200).json({data: employee, recentApplicationJob})
