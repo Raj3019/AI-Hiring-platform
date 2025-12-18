@@ -16,6 +16,7 @@ const applicationSchema = new mongoose.Schema({
   postedBy:{
     type:mongoose.Schema.Types.ObjectId,
     ref: "Recuter",
+    required: true
   },
   resume:{
     type: String,
@@ -24,11 +25,44 @@ const applicationSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["Applied", "Pending", "Accepted", "Rejected"],
-    default: "Applied"
+    default: "Applied",
+    required: true
+  },
+  aiMatchScore: {
+    overallScore: {
+      type: Number,
+      min: 0,
+      max: 100
+    },
+    skillsMatch: {
+      type: Number,
+      min: 0,
+      max: 100
+    },
+    experienceMatch: {
+      type: Number,
+      min: 0,
+      max: 100
+    },
+    educationMatch: {
+      type: Number,
+      min: 0,
+      max: 100
+    },
+  calculatedAt: {
+      type: Date,
+      default: Date.now
+  },
+  insights: {
+    type: String 
+  },
+  matchedSkills: [String],
+  missingSkills: [String],  
   },
   appliedAt:{
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   }
 }, {timestamps: true})
 

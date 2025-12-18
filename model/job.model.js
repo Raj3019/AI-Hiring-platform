@@ -15,6 +15,11 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: [true, "Location is required"]
   },
+  jobType:{
+    type: String,
+    enum: ["Full-time", "Part-time", "Contract", "Intership", "Freelance"],
+    required: [true, "Job Type is required"]
+  },
   workType:{
     type: String,
     enum: ["Remote", "On-site", "Hybrid"],
@@ -32,7 +37,7 @@ const jobSchema = new mongoose.Schema({
     required:[true, "Skill is required"]
   },
   experienceLevel: {
-    type: String
+    type: String       // need enum here
   },
   salary:{
     min:{type: Number, required: [true, "Minimum Salary is required"]},
@@ -42,14 +47,53 @@ const jobSchema = new mongoose.Schema({
       default: "INR"
     }
   },
+  applicationDeadline:{
+    type: Date
+  },
+  openings: {
+    type: Number,
+    default: 1,
+    min: 1
+  },
+  status: {
+    type: String,
+    enum: ["Active", "Closed"],
+    default: "Active"
+  },
+  industry:{
+    type: String
+  },
+  benefits: {
+    type: [String]
+  },
+  educationRequired: {
+    type: String
+  },
+  // viewCount: {
+  //   type: Number,
+  //   default: 0
+  // },
   postedBy:{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Recuter",
     required: true
   },
   appliedBy:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee"
+    type:[{
+      applicant:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Employee"
+      },
+      appliedAt:{
+        type: Date,
+        default: Date.now
+      },
+      status:{
+        type: String,
+        enum: ["Pending", "Reviewed", "Shortlisted", "Rejected", "Hired"],
+        default: "Pending"
+      }  
+    }]
   }
 },{ timestamps: true })
 

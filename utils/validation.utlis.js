@@ -144,6 +144,7 @@ const RecurterRegisterValidation = z
     fullName: z.string(),
     email: z.string().email(),
     password: z.string().min(8, "Password must be at least 8 characters long"),
+    confirmPassword: z.string(),
     phone: z.string().regex(/^\d{10}$/, "Phone number must be 10 digits"),
     age: z.number(),
     role: z.string().default("Recuter"),
@@ -153,7 +154,11 @@ const RecurterRegisterValidation = z
     currentEmployer: z.string(),
     companyURL: z.string(),
   })
-  .strict();
+  .strict()
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const RecurterLoginValidation = z.object({
   email: z.string().email(),

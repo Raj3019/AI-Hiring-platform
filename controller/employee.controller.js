@@ -185,7 +185,9 @@ const profileEmployee = async (req, res) => {
       return res.status(401).json({message: "Employee with this id not found"})
     }
     // const appliedJob = employee.appliedJobs
-    const recentApplication = await Application.find({JobSeeker: user.id}).sort({appliedAt: -1}).populate('job')
+    const recentApplication = await Application.find({JobSeeker: user.id}).sort({appliedAt: -1})
+    .populate('job', 'title companyName location workType jobType salary status')
+      .select('job status appliedAt aiMatchScore resume') // Include aiMatchScore
     
     const recentApplicationJob = recentApplication ? recentApplication : null
     return res.status(200).json({data: employee, recentApplicationJob})
@@ -198,6 +200,12 @@ const editEmployee = async(req, res) => {
   try{
     const employeeId = req.params.id;
     
+    // Check if req.body exists and has data
+    if(!req.body){
+      return res.status(400).json({message: "No data provided to update"})
+    }
+    
+    // Hash password if it's being updated
     if(req.body.password){
       req.body.password = await bcrypt.hash(req.body.password, 10)
     }
@@ -205,14 +213,14 @@ const editEmployee = async(req, res) => {
     const employee = await Employee.findByIdAndUpdate(employeeId, req.body, {new: true}).select('-password')
     
     if(!employee){
-      return res.status(401).json({message: "Employee not found"})
+      return res.status(404).json({message: "Employee not found"})
     }
     
     return res.status(200).json({data: employee, message: "Employee updated sucessfully"})
     
   }catch(err){
     console.log(err)
-    res.status(401).json({message: "Unable to update employee"})
+    res.status(500).json({message: "Unable to update employee"})
   }
 } 
 
@@ -255,24 +263,78 @@ const employeeDashboard = async(req, res) => {
 }
 
 
+// Get employee's applications
 
+const getMyApplications = async(req, res) => {
+  try{
+    const employeeId = req.user.id;
+    const applicants = await Application.find({JobSeeker: employeeId})
+    .populate('job', 'title companyName location workType jobType salary status')
+    .sort({appliedAt: -1})
+
+    return res.status(200).json({
+      success: true,
+      count: applicants.length,
+      data: applicants
+    })
+  }catch(err){
+    console.log(err)
+    return res.status(500).json({
+      message: "Failed to fetch applications",
+      error: err.message
+    })
+  }
+}
+
+//get single application details
+const getApplicationById = async (req, res) => {
+  try {
+    const {applicationId} = req.params;
+    const employeeId = req.user.id
+    
+    const application = await Application.findOne({
+      _id: applicationId,
+      JobSeeker: employeeId
+    }).populate('job', 'title companyName location status workType')
+    .populate('postedBy', 'fullName companyName email phone')
+
+    if(!application){
+      return res.status(404).json({
+        success: false,
+        message: "Applicant not found"
+      })
+    }
+
+    return res.status(200).json({
+      sucess:true,
+      data: application
+    })
+    
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      message: "Failed tp fetch application",
+      error: err.message
+    })
+  }
+}
 
   
-// const logoutEmployee = async (req, res) => {
-//   try{
-//     const employee = req.user;
+const logoutEmployee = async (req, res) => {
+  try{
+    const employee = req.user;
     
-//     if(!employee){
-//       return res.status(401).json({message: "Employee not found"})
-//     }
+    if(!employee){
+      return res.status(401).json({message: "Employee not found"})
+    }
     
-//    res.clear
-//   return res.status(201).json({message: "logout sucessfully"})
+   res.clear
+  return res.status(201).json({message: "logout sucessfully"})
     
-//   }catch(err){
-//     return res.status(401).json({message: "Logout failed"})
-//   }
-// }  
+  }catch(err){
+    return res.status(401).json({message: "Logout failed"})
+  }
+}  
   
   
 module.exports = {
@@ -283,6 +345,8 @@ module.exports = {
   editEmployee,
   uploadResume,
   uploadProfilePicture,
-  employeeDashboard
-  // logoutEmployee
+  employeeDashboard,
+  getMyApplications,
+  getApplicationById,
+  logoutEmployee
 }

@@ -57,6 +57,14 @@ const recurterSchema = new mongoose.Schema(
       enum: ["Male", "Female"],
       required: true,
     },
+      skills: {
+      type: [String],
+      default: []
+	  },
+      experienceYears: {
+      type: Number,
+      default: 0
+	  },
     education: {
       tenth: {
         schoolName: String,

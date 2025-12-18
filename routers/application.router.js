@@ -18,7 +18,7 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-  "/api/job/test/:id",
+  "/api/job/score/:id",
   authenticateJWT,
   authenticateRole("Employee"),
   upload.single("resume"),

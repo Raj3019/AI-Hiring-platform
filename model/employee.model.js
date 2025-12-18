@@ -24,6 +24,9 @@ const employeeSchema = new mongoose.Schema({
 		unique: true,
 		sparse: true 
 	},
+	dateOfBirth: {
+    type: Date,
+  },
 	gender:{
 		type: String,
 		enum: ["Male", "Female", "Other"],
