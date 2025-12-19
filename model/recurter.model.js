@@ -15,7 +15,10 @@ const recurterSchema = new mongoose.Schema(
       trim: true,
     },
     profilePicture: {
-      type: String,
+      type: String
+    },
+    profilePicturePublicId: {
+      type: String
     },
     password: {
       type: String,
@@ -182,6 +185,9 @@ const recurterSchema = new mongoose.Schema(
     resumeFileURL: {
       type: String,
     },
+    resumePublicLinkId: {
+		type: String,
+	},
     portfolioUrl: {
       type: String,
     },

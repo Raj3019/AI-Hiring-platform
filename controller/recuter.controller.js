@@ -3,9 +3,11 @@ const Application = require("../model/application.model");
 const jwt = require("jsonwebtoken")
 const jwtToken = process.env.JWT_TOKEN_Secret
 const bcrypt = require('bcryptjs');
+const fs = require('fs')
 const Job = require('../model/job.model')
 const {RecurterRegisterValidation, RecurterLoginValidation} = require('../utils/validation.utlis');
 const { default: mongoose } = require("mongoose");
+const { deleteFromCloudinary, uploadResumeToCloudnary, uploadToCloudinary, deleteResumeFromCloudinary } = require("../utils/cloudnary.utlis");
 // const salt = process.env.SALT
 
 //Register Controller
@@ -78,6 +80,43 @@ const loginRecuter = async (req, res) => {
 }
 
 
+const uploadProfilePicture = async (req, res) => {
+  try {
+    if(!req.file){
+      return res.status(400).json({message: 'No file Uploaded'})
+    }
+    
+    const recruiterId = req.user.id
+    const recruiter = await Recuter.findById(recruiterId)
+    if (!recruiter) {
+      return res.status(404).json({ message: "Recruiter not found" });
+    }
+
+    if(recruiter.profilePicturePublicId){
+      await deleteFromCloudinary(recruiter.profilePicturePublicId)
+    }
+
+    const result = await uploadToCloudinary(req.file.path)
+
+    recruiter.profilePicture = result.url
+    recruiter.profilePicturePublicId = result.public_id
+    await recruiter.save();
+
+    fs.unlinkSync(req.file.path)
+
+    res.status(200).json({
+      message: "Profile Picture uploaded succesfully",
+      profilePicture: result.url
+    })
+  } catch (error) {
+    if(req.file && fs.existsSync(req.file.path)){
+      fs.unlinkSync(req.file.path)
+    }
+    console.log(error)
+    return res.status(401).json({message: "Unable to Upload Profile Picture"})
+  }
+}
+
 // Profile Controller
 const profileRecuter = async(req, res) => {
   try{
@@ -127,6 +166,35 @@ const profileRecuter = async(req, res) => {
   }
 }
 
+const uploadResume = async(req, res) => {
+  try {
+    const recruiterId = req.user.id
+    const recuter = await Recuter.findById(recruiterId)
+
+    if(recuter.resumePublicLinkId){
+      await deleteResumeFromCloudinary(recuter.resumePublicLinkId)
+    }
+
+    const result = await uploadResumeToCloudnary(req.file.path)
+
+    recuter.resumeFileURL = result.url
+    recuter.resumePublicLinkId = result.public_id
+    await recuter.save()
+
+    fs.unlinkSync(req.file.path)
+
+    res.status(200).json({
+      message: "Resume Uploaded Successfully",
+      resumeLink: result.url
+    })
+  } catch (error) {
+    if(req.file && fs.existsSync(req.file.path)){
+      fs.unlinkSync(req.file.path)
+    }
+    console.log(error)
+    res.status(500).json({message: error.message})
+  }
+}
 
 //Edit Pofile
 
@@ -420,6 +488,8 @@ module.exports = {
   logoutRecruter,
   profileRecuter,
   editRecuter,
+  uploadProfilePicture,
+  uploadResume,
   getJobApplicationStats,
   getAllJobsByRecruiter,
   updateApplicationStatus,

@@ -40,9 +40,11 @@ const uploadResumeToCloudnary = async (filePath, folder = "resume") => {
     try {
         const resume = await cloudnary.uploader.upload(filePath, {
             folder: folder,
-            resource_type: 'raw',
+            resource_type: 'auto',
             use_filename: true,
             unique_filename: true,
+            format: 'pdf',
+            flags: 'attachment',
             access_mode: 'public'
         })
         return {
