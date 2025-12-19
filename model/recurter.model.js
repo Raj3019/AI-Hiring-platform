@@ -5,8 +5,7 @@ const mongoose = require("mongoose");
 const recurterSchema = new mongoose.Schema(
   {
     fullName: {
-      type: String,
-      required: [true, "Full Name is required"],
+      type: String
     },
     email: {
       type: String,
@@ -20,10 +19,10 @@ const recurterSchema = new mongoose.Schema(
     },
     password: {
       type: String,
+      required: true
     },
     phone: {
       type: String,
-      required: [true, "Phone Number is required"],
       maxlength: 10,
     },
     dateOfBirth: {
@@ -54,8 +53,7 @@ const recurterSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["Male", "Female"],
-      required: true,
+      enum: ["Male", "Female"]
     },
       skills: {
       type: [String],
@@ -160,12 +158,10 @@ const recurterSchema = new mongoose.Schema(
       },
     ],
     currentRole: {
-      type: String,
-      required: true,
+      type: String
     },
     currentEmployer: {
-      type: String,
-      required: true,
+      type: String
     },
     companyURL: {
       type: String,

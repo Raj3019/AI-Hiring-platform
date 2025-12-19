@@ -1,7 +1,7 @@
 const Employee = require("../model/employee.model.js");
 const Application = require("../model/application.model.js");
 const Job = require("../model/job.model.js")
-const {EmployeeRegisterValidation, EmployeeLoginValidation, EmployeeSetupValidation} = require("../utils/validation.utlis.js")
+const {EmployeeRegisterValidation, EmployeeLoginValidation} = require("../utils/validation.utlis.js")
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -23,11 +23,11 @@ const registerEmployee = async (req, res) => {
       password
     } = validateBody.data;
     
-    const passwordHash = await bcrypt.hash(password, 10)
     const checkEmail = await Employee.findOne({ email })
     if (checkEmail) {
       return res.status(409).json({ error: "Employee with this email already exists" });
     }
+    const passwordHash = await bcrypt.hash(password, 10)
     const employee = new Employee({
       email,
       password: passwordHash,
@@ -146,34 +146,34 @@ const uploadResume = async(req, res) => {
   }
 }
 
-const setupEmployee = async(req, res) => {
-  try {
+// const setupEmployee = async(req, res) => {
+//   try {
 
-    const employeeId = req.user.id
-    const validateBody = EmployeeSetupValidation.safeParse(req.body)
+//     const employeeId = req.user.id
+//     const validateBody = EmployeeSetupValidation.safeParse(req.body)
 
     
-    if(!validateBody.success){
-      return res.status(400).json({error: validateBody.error})
-    }
+//     if(!validateBody.success){
+//       return res.status(400).json({error: validateBody.error})
+//     }
 
-    const updateData = req.body
+//     const updateData = req.body
 
-    const employee = await Employee.findByIdAndUpdate(employeeId, {$set: updateData}, {new: true})
+//     const employee = await Employee.findByIdAndUpdate(employeeId, {$set: updateData}, {new: true})
 
-    if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
-    }
+//     if (!employee) {
+//       return res.status(404).json({ message: "Employee not found" });
+//     }
 
-    await employee.save();
+//     await employee.save();
 
-    res.status(200).json({message: "Setup Done Sucessfully"})
+//     res.status(200).json({message: "Setup Done Sucessfully"})
 
-  } catch (err) {
-    console.log(err)
-    return res.status(401).josn({message: "Unable to setup employee"})
-  }
-}
+//   } catch (err) {
+//     console.log(err)
+//     return res.status(401).josn({message: "Unable to setup employee"})
+//   }
+// }
 
 const profileEmployee = async (req, res) => {
   try{
@@ -340,7 +340,6 @@ const logoutEmployee = async (req, res) => {
 module.exports = {
   registerEmployee,
   loginEmployee,
-  setupEmployee,
   profileEmployee,
   editEmployee,
   uploadResume,
@@ -348,5 +347,6 @@ module.exports = {
   employeeDashboard,
   getMyApplications,
   getApplicationById,
-  logoutEmployee
+  logoutEmployee,
+  // setupEmployee
 }

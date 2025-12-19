@@ -18,7 +18,7 @@ const registerRecuter = async (req, res) => {
       return res.status(400).json({error: validateBody.error})
     }
     
-    const { fullName, email, role, password, phone, age, gender, location, currentRole, currentEmployer, companyURL } = validateBody.data;
+    const { email, password } = validateBody.data;
     
     const existingEmail = await Recuter.findOne({email})
     
@@ -28,23 +28,17 @@ const registerRecuter = async (req, res) => {
     
     const passwordHash = await bcrypt.hash(password, 10);
     
-    const savedUser = new Recuter({
-      fullName,
+    const recruiter = new Recuter({
       email, 
-      role,
       password: passwordHash,
-      phone, 
-      age,
-      gender,
-      location,
-      currentRole,
-      currentEmployer,
-      companyURL
+      
     })
     
-    await savedUser.save()
-    return res.status(200).json({data: savedUser, message: "Recuter created sucessfully"})
+    await recruiter.save()
+    const token = jwt.sign({id: recruiter._id, role: recruiter.role}, jwtToken, {expiresIn: "1hr"})
+    return res.status(200).json({message: "Recuter created sucessfully",token})
   }catch(err){
+    console.log(err)
     return res.status(401).json({message: "Unable to Signup"})
   }
 }
