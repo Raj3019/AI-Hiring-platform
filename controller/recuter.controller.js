@@ -38,7 +38,22 @@ const registerRecuter = async (req, res) => {
     
     await recruiter.save()
     const token = jwt.sign({id: recruiter._id, role: recruiter.role}, jwtToken, {expiresIn: "1hr"})
-    return res.status(200).json({message: "Recuter created sucessfully",token})
+    // return res.status(200).json({message: "Recuter created sucessfully",token})
+    
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 25 * 60 * 1000 // 7 days
+    })
+
+    return res.stauts(200).json({
+      user:{
+        id: recruiter._id,
+        email: recruiter.email,
+        role: recruiter.role
+      }
+    })
   }catch(err){
     console.log(err)
     return res.status(401).json({message: "Unable to Signup"})
@@ -71,7 +86,22 @@ const loginRecuter = async (req, res) => {
     
     const token = jwt.sign({id: recuter._id, role: recuter.role}, jwtToken, {expiresIn: "1hr"})
     
-    return res.status(200).json({ message: "Login Successful" , data: token});
+    // return res.status(200).json({ message: "Login Successful" , data: token});
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 25 * 60 * 1000 // 7 days
+    })
+
+    return res.status(200).json({
+      user:{
+        id: recuter._id,
+        email: recuter.email,
+        role: recuter.role
+      }
+    })
     
   }catch(err){
     console.log(err)
@@ -473,7 +503,12 @@ const logoutRecruter = async (req, res) => {
       return res.status(401).json({message: "Recruiter not found"})
     }
     
-   res.clear
+  //  res.clear
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  })
   return res.status(201).json({message: "logout sucessfully"})
     
   }catch(err){

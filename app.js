@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const connectToDB = require('./database/config.database')
 require('dotenv').config()
 const Port = process.env.PORT
@@ -12,11 +13,11 @@ const applicationRouter = require("./routers/application.router")
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use(cookieParser())
 
 app.use(cors({
-  origin:[
-    'http://localhost:3001'
-  ]
+   origin:'http://localhost:3001',
+   credentials: true
 }))
 
 app.use('/', employeeRouter)

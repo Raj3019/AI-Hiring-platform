@@ -2,8 +2,15 @@ const jwt = require("jsonwebtoken")
 const jwtToken = process.env.JWT_TOKEN_Secret
 
 const authenticateJWT = async(req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
+
+  let token = req.cookies.token
+
+  // const token = req.headers["authorization"]?.split(" ")[1];
   
+  if(!token){
+    token = req.headers["authorization"]?.split(" ")[1];
+  }
+
   if(!token){
     return res.status(403).json({error: "Access denied, token missing"})
   }
