@@ -154,10 +154,10 @@ const profileRecuter = async(req, res) => {
     
     const recuter = await Recuter.findById(recuterId.id).select('-password').populate({
         path: 'jobs',
-        select: 'title companyName location jobType salary status createdAt skillsRequired',
+        select: '_id title companyName location jobType salary status createdAt skillsRequired',
         populate: {
           path: 'appliedBy.applicant',
-          select: 'fullName email phone skills experienceYears currentJobTitle profilePicture'
+          select: '_id fullName email phone skills experienceYears currentJobTitle profilePicture'
         }
       })
     
@@ -168,13 +168,14 @@ const profileRecuter = async(req, res) => {
     const jobsWithDetails = await Promise.all(
       recuter.jobs.map(async (job) => {
         const applications = await Application.find({ job: job._id })
-          .populate('JobSeeker', 'fullName email phone skills experienceYears currentJobTitle profilePicture')
-          .select('status aiMatchScore resume appliedAt');
+          .populate('JobSeeker', '_id fullName email phone skills experienceYears currentJobTitle profilePicture')
+          .select('_id status aiMatchScore resume appliedAt');
         
         return {
           ...job.toObject(),
           totalApplications: applications.length,
           applications: applications.map(app => ({
+            _id: app._id,
             applicant: app.JobSeeker,
             status: app.status,
             aiMatchScore: app.aiMatchScore,
@@ -337,9 +338,9 @@ const getAllJobsByRecruiter = async (req, res) => {
               return acc;
             }, {
               Applied: 0,
-              Pending: 0,
-              Accepted: 0,
-              Rejected: 0
+              Shortlist: 0,
+              Accept: 0,
+              Reject: 0
             })
           }
         };
@@ -414,7 +415,7 @@ const updateApplicationStatus = async (req, res) => {
   const recruiterId = req.user.id 
 
   //validate status input
-  const validateStatuses = ["Applied", "Pending", "Accepted", "Rejected"];
+  const validateStatuses = ["Applied", "Pending", "Shortlist","Accept", "Reject"];
   if(!validateStatuses.includes(status)){
     return res.status(400).json({message: "Invalid Status"})
   }
@@ -434,7 +435,7 @@ const updateApplicationStatus = async (req, res) => {
 
   await Job.updateOne(
     {_id: application.job, "appliedBy.applicant": application.JobSeeker},
-    {$set: {"appliedBy.$.status": status.toLowerCase()}}
+    {$set: {"appliedBy.$.status": status}}
   );
 
   return res.status(200).json({
@@ -493,6 +494,38 @@ const getJobApplicationStats = async (req, res) => {
   }
 }
 
+const getAllCandidates = async(req, res) => {
+  try {
+    const recruiterId = req.user.id
+
+    const recruiter = await Recuter.findById(recruiterId).populate({
+      path: 'jobs',
+      populate:{
+        path: 'appliedBy.applicant'
+      }
+    });
+
+    if(!recruiter){
+      return res.status(404).json({message: "Recuter not found"})
+    }
+
+    const getCandidates = recruiter.jobs.map(job => ({
+      applicants: (job.appliedBy).map( a => ({
+        profilePicture: a.applicant?.profilePicture,
+        fullName: a.applicant?.fullName,
+        email: a.applicant?.email,
+        skills: a.applicant?.skills,
+        currentJobTitle: a.applicant?.currentJobTitle
+      }))
+    }))
+
+    return res.status(200).json({data: getCandidates})
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({message: "Unable to fetch talents"})
+  }
+}
 
   
 const logoutRecruter = async (req, res) => {
@@ -528,6 +561,7 @@ module.exports = {
   getJobApplicationStats,
   getAllJobsByRecruiter,
   updateApplicationStatus,
+  getAllCandidates,
   getApplicationsByJob
   // recuterDashboard
 }

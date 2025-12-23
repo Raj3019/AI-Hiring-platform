@@ -44,7 +44,7 @@ const uploadResumeToCloudnary = async (filePath, folder = "resume") => {
             use_filename: true,
             unique_filename: true,
             format: 'pdf',
-            flags: 'attachment',
+            // flags: 'attachment',
             access_mode: 'public'
         })
         return {

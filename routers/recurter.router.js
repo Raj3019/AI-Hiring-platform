@@ -1,5 +1,5 @@
 const express = require("express")
-const {registerRecuter, loginRecuter, profileRecuter,logoutRecruter, editRecuter, getApplicationsByJob, updateApplicationStatus, getJobApplicationStats, getAllJobsByRecruiter, uploadResume, uploadProfilePicture} = require("../controller/recuter.controller")
+const {registerRecuter, loginRecuter, profileRecuter,logoutRecruter, editRecuter, getApplicationsByJob, updateApplicationStatus, getJobApplicationStats, getAllJobsByRecruiter, uploadResume, uploadProfilePicture, getAllCandidates} = require("../controller/recuter.controller")
 const {authenticateJWT} = require("../middleware/auth.middleware")
 const recuterRouter = express.Router()
 const upload = require("../middleware/multer.middleware");
@@ -22,6 +22,8 @@ recuterRouter.get("/api/recuter/profile", authenticateJWT,profileRecuter)
 //Edit Profile
 recuterRouter.put("/api/recuter/profile/:id",authenticateJWT, editRecuter)
 
+// Get All Candidate
+recuterRouter.get("/api/recuter/talents", authenticateJWT, getAllCandidates)
 
 recuterRouter.post("/api/recuter/profile/resume", authenticateJWT, upload.single('resume'), uploadResume)
 
