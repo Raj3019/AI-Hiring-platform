@@ -10,6 +10,9 @@ const employeeSchema = new mongoose.Schema({
 	about: {
 		type: String,
 	},
+	headline:{
+		type: String
+	},
 	email: {
 		type: String,
 		lowercase: true,
@@ -53,9 +56,6 @@ const employeeSchema = new mongoose.Schema({
 	zipCode: {
 		type: String,
 	},
-	headline: {
-		type: String,
-	},
 	currentJobTitle: {
 		type: String,
 	},
@@ -79,7 +79,7 @@ const employeeSchema = new mongoose.Schema({
 			schoolName: String,
 			board: {
 				type: String,
-				enum: ["CBSE", "ICSE", "State Board", "Other"],
+				enum: ["CBSE", "ICSE", "State Board", "Other", ""],
 			},
 			percentage: Number,
 			grade: String,
@@ -91,11 +91,11 @@ const employeeSchema = new mongoose.Schema({
 			collegeName: String,
 			board: {
 				type: String,
-				enum: ["CBSE", "ICSE", "State Board", "Other"],
+				enum: ["CBSE", "ICSE", "State Board", "Other", ""],
 			},
 			stream: {
 				type: String,
-				enum: ["Science", "Commerce", "Arts", "Other"],
+				enum: ["Science", "Commerce", "Arts", "Other", ""],
 			},
 			percentage: Number,
 			grade: String,

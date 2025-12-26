@@ -77,13 +77,13 @@ const loginEmployee = async (req, res) => {
     const employee = await Employee.findOne({ email });
 
     if (!employee) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Invalid Credentials" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, employee.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Invalid Credentials" });
     }
 
     const token = jwt.sign({id: employee._id, role: employee.role}, jwtToken, {expiresIn: "1hr"})
@@ -120,15 +120,25 @@ const uploadProfilePicture = async (req, res) => {
     const employeeId = req.user.id
     const employee = await Employee.findById(employeeId);
 
+    if(!employee){
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
     if(employee.profilePicturePublicId){
       await deleteFromCloudinary(employee.profilePicturePublicId)
     }
 
     const result = await uploadToCloudinary(req.file.path)
 
-    employee.profilePicture = result.url;
-    employee.profilePicturePublicId = result.public_id
-    await employee.save();
+    // Use findByIdAndUpdate to only update profile picture fields without triggering full document validation
+    await Employee.findByIdAndUpdate(
+      employeeId,
+      {
+        profilePicture: result.url,
+        profilePicturePublicId: result.public_id
+      },
+      { runValidators: false } // Skip validation since we're only updating profile picture fields
+    );
 
     fs.unlinkSync(req.file.path);
 
@@ -152,15 +162,25 @@ const uploadResume = async(req, res) => {
     const employeeId = req.user.id
     const employee = await Employee.findById(employeeId)
 
+    if(!employee){
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
     if(employee.resumePublicLinkId){
       await deleteResumeFromCloudinary(employee.resumePublicLinkId)
     }
 
     const result = await uploadResumeToCloudnary(req.file.path)
 
-    employee.resumeFileURL = result.url
-    employee.resumePublicLinkId = result.public_id
-    await employee.save();
+    // Use findByIdAndUpdate to only update resume fields without triggering full document validation
+    await Employee.findByIdAndUpdate(
+      employeeId,
+      {
+        resumeFileURL: result.url,
+        resumePublicLinkId: result.public_id
+      },
+      { runValidators: false } // Skip validation since we're only updating resume fields
+    );
 
     fs.unlinkSync(req.file.path)
 
@@ -226,6 +246,7 @@ const profileEmployee = async (req, res) => {
     return res.status(401).json({message: "Employee profile not found"})
   }
 }
+
 
 const editEmployee = async(req, res) => {
   try{

@@ -154,7 +154,7 @@ const profileRecuter = async(req, res) => {
     
     const recuter = await Recuter.findById(recuterId.id).select('-password').populate({
         path: 'jobs',
-        select: '_id title companyName location jobType salary status createdAt skillsRequired',
+        select: '_id title companyName location jobType salary status createdAt skillsRequired applicationDeadline',
         populate: {
           path: 'appliedBy.applicant',
           select: '_id fullName email phone skills experienceYears currentJobTitle profilePicture'
@@ -297,7 +297,7 @@ const getAllJobsByRecruiter = async (req, res) => {
 
     // Find all jobs posted by this recruiter
     const jobs = await Job.find({ postedBy: recruiterId })
-      .select('title companyName location jobType salary status createdAt skillsRequired')
+      .select('title companyName location jobType salary status createdAt skillsRequired applicationDeadline')
       .sort({ createdAt: -1 });
 
     // Get application counts and stats for each job

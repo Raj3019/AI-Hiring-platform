@@ -14,6 +14,9 @@ const recurterSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    headline:{
+		type: String
+	  },
     profilePicture: {
       type: String
     },
@@ -71,7 +74,7 @@ const recurterSchema = new mongoose.Schema(
         schoolName: String,
         board: {
           type: String,
-          enum: ["CBSE", "ICSE", "State Board", "Other"],
+          enum: ["CBSE", "ICSE", "State Board", "Other", ""],
         },
         percentage: Number,
         grade: String,
@@ -83,11 +86,11 @@ const recurterSchema = new mongoose.Schema(
         collegeName: String,
         board: {
           type: String,
-          enum: ["CBSE", "ICSE", "State Board", "Other"],
+          enum: ["CBSE", "ICSE", "State Board", "Other", ""],
         },
         stream: {
           type: String,
-          enum: ["Science", "Commerce", "Arts", "Other"],
+          enum: ["Science", "Commerce", "Arts", "Other", ""],
         },
         percentage: Number,
         grade: String,
