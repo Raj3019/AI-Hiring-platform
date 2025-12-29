@@ -55,7 +55,7 @@ const registerRecuter = async (req, res) => {
       }
     })
   }catch(err){
-    console.log(err)
+    // console.log(err)
     return res.status(401).json({message: "Unable to Signup"})
   }
 }
@@ -104,8 +104,8 @@ const loginRecuter = async (req, res) => {
     })
     
   }catch(err){
-    console.log(err)
-    return res.status(401).json({message: "Unable to Login"})
+    // console.log(err)
+    return res.status(401).json({message: "Unable to Login", error: err.message})
   }
 }
 
@@ -142,8 +142,8 @@ const uploadProfilePicture = async (req, res) => {
     if(req.file && fs.existsSync(req.file.path)){
       fs.unlinkSync(req.file.path)
     }
-    console.log(error)
-    return res.status(401).json({message: "Unable to Upload Profile Picture"})
+    // console.log(error)
+    return res.status(401).json({message: "Unable to Upload Profile Picture", error: err.message})
   }
 }
 
@@ -192,8 +192,8 @@ const profileRecuter = async(req, res) => {
       } ,message: "Profile sucessfully fetched"})
     
   }catch(err){
-    console.log(err)
-    return res.status(401).json({message: "Unable to fetch profile"})
+    // console.log(err)
+    return res.status(401).json({message: "Unable to fetch profile", error: err.message})
   }
 }
 
@@ -222,7 +222,7 @@ const uploadResume = async(req, res) => {
     if(req.file && fs.existsSync(req.file.path)){
       fs.unlinkSync(req.file.path)
     }
-    console.log(error)
+    // console.log(error)
     res.status(500).json({message: error.message})
   }
 }
@@ -245,8 +245,8 @@ const editRecuter = async (req, res) => {
     
     return res.status(200).json({data:recuter ,message: "Profile edited sucessfully"})
   }catch(err){
-    console.log(err)
-    return res.status(401).json({message: "Unable unable to Edit Profile"})
+    // console.log(err)
+    return res.status(401).json({message: "Unable unable to Edit Profile", error: err.message})
   }
 }
 
@@ -354,7 +354,7 @@ const getAllJobsByRecruiter = async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res.status(500).json({
       message: "Failed to fetch jobs",
       error: err.message
@@ -397,7 +397,7 @@ const getApplicationsByJob = async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res.status(500).json({
       message: "Failed to fetch applications",
       error: err.message
@@ -444,7 +444,7 @@ const updateApplicationStatus = async (req, res) => {
     data: application
   })
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     return res.status(500).json({
       message: "Failed to update Status",
       error: err.message
@@ -486,7 +486,7 @@ const getJobApplicationStats = async (req, res) => {
       }
     })
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     return res.status(500).json({
       message: "Failed to fetch stats",
       error: err.message
@@ -522,7 +522,7 @@ const getAllCandidates = async(req, res) => {
     return res.status(200).json({data: getCandidates})
 
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     return res.status(500).json({message: "Unable to fetch talents"})
   }
 }

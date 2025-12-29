@@ -69,8 +69,8 @@ const checkProfileComplete = async(req, res, next) =>{
 
       next()
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({message: "Error checking profile"})
+    // console.log(error)
+    return res.status(500).json({message: "Error checking profile", error: err.message})
   }
 }
 

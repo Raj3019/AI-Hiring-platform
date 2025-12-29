@@ -334,7 +334,7 @@ const applyJob = async (req, res) => {
       // console.error('Failed to update employee');
       throw new Error('Failed to update employee appliedJobs');
     }
-    console.log('✅ Employee updated, appliedJobs:', updatedEmployee.appliedJobs);
+    // console.log('✅ Employee updated, appliedJobs:', updatedEmployee.appliedJobs);
     
     
     // Update job
@@ -377,7 +377,7 @@ const applyJob = async (req, res) => {
     });
     
   } catch(err) {
-    console.log(err);
+    // console.log(err);
     return res.status(500).json({
       message: "Failed to apply for job", 
       error: err.message

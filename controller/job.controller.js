@@ -1,5 +1,4 @@
 const Job = require("../model/job.model")
-const Employee = require("../model/employee.model")
 const Recuter = require("../model/recurter.model");
 const Application = require("../model/application.model");
 
@@ -8,12 +7,13 @@ const createJob = async (req, res) => {
     const recuter = req.user;
     // console.log(recuter)
     
-    const {title, description, location,companyName, jobType, department,applicationDeadline, openings, status, industry, benefits , educationRequired,workType, skillsRequired, experienceLevel, salary, postedBy} = req.body
+    const {title, description, jobRequirements,location,companyName, jobType, department,applicationDeadline, openings, status, industry, benefits , educationRequired,workType, skillsRequired, experienceLevel, salary, postedBy} = req.body
     
     const job = new Job(
       {
         title,
         description,
+        jobRequirements,
         location,
         companyName,
         department,
@@ -40,8 +40,8 @@ const createJob = async (req, res) => {
     return res.status(200).json({data: createdJob, message: "Job Created sucessfully"})
     
   }catch(err){
-    console.log(err)
-    return res.status(201).json({message: "Unable to create Job"})
+    // console.log(err)
+    return res.status(201).json({message: "Unable to create Job", error: err.message})
   }
 }
 
@@ -69,8 +69,8 @@ const listJobs = async(req, res) => {
     }
     return res.status(200).json({data: jobs, message: "Fetched all the jobs"})
   }catch(err){
-    console.log(err)
-    return res.status(500).json({message: "Unable to list Job"})
+    // console.log(err)
+    return res.status(500).json({message: "Unable to list Job", error: err.message})
   }
 }
 
@@ -87,8 +87,8 @@ const editJob = async (req, res) => {
     const updateJob = await Job.findByIdAndUpdate(jobId, req.body, {new: true})
     return res.status(200).json({data: updateJob, message: "Job updated successfully"})
   } catch (error) {
-    console.log(err)
-    return res.status(201).json({message: "Unable to update Job"})
+    // console.log(err)
+    return res.status(201).json({message: "Unable to update Job", error: err.message})
   }
 }
 
@@ -104,8 +104,8 @@ const getJobById = async (req, res) => {
     
     return res.status(200).json({data: getJobById, message: "Fetched the job"})
   }catch(err){
-    console.log(err)
-    return res.status(201).json({message: "Unable to get Job"})
+    // console.log(err)
+    return res.status(201).json({message: "Unable to get Job", error: err.message})
   }
 }
 

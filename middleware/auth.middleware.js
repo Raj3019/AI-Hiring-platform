@@ -23,12 +23,12 @@ const authenticateJWT = async(req, res, next) => {
     next()
   }catch(error){
     // console.log(" JWT verification failed:", error.message)
-    return res.status(401).json({error: "Invalid or expired token"})
+    return res.status(401).json({message: "Invalid or expired token", error: error.message})
   }
 }
 
 const authenticateRole = (requiredRole) => async(req, res, next) => {
-  console.log("🔍 authenticateRole called with required role:", requiredRole)
+  // console.log("🔍 authenticateRole called with required role:", requiredRole)
   if(!req.user){
     // console.log("No req.user found")
     return res.status(401).json({err: "Unauthozied user"})

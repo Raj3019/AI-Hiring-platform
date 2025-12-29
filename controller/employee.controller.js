@@ -53,7 +53,7 @@ const registerEmployee = async (req, res) => {
 
     // res.status(200).json({ "message": "Employee sucessfully created" , token})
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     res.status(400).send(`Error: ${error}`)
   }
 }
@@ -151,7 +151,7 @@ const uploadProfilePicture = async (req, res) => {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    console.log(error);
+    // console.log(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -192,7 +192,7 @@ const uploadResume = async(req, res) => {
     if(req.file && fs.existsSync(req.file.path)){
       fs.unlinkSync(req.file.path);
     }
-    console.log(error);
+    // console.log(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -229,7 +229,7 @@ const uploadResume = async(req, res) => {
 const profileEmployee = async (req, res) => {
   try{
     const user = req.user
-    console.log(user.id)
+    // console.log(user.id)
     
     const employee = await Employee.findById(user.id).select('-password')
     if (!employee){
@@ -271,8 +271,8 @@ const editEmployee = async(req, res) => {
     return res.status(200).json({data: employee, message: "Employee updated sucessfully"})
     
   }catch(err){
-    console.log(err)
-    res.status(500).json({message: "Unable to update employee"})
+    // console.log(err)
+    res.status(500).json({message: "Unable to update employee", error: err.message})
   }
 } 
 
@@ -309,8 +309,8 @@ const employeeDashboard = async(req, res) => {
     return res.status(200).json({data: appliedJob, message: "Fetched all the applied job"})
     
   }catch(err){
-    console.log(err)
-    return res.status(401).json({message: "Unable to fetch dashboard data"})
+    // console.log(err)
+    return res.status(401).json({message: "Unable to fetch dashboard data", error: err.message})
   }
 }
 
@@ -330,7 +330,7 @@ const getMyApplications = async(req, res) => {
       data: applicants
     })
   }catch(err){
-    console.log(err)
+    // console.log(err)
     return res.status(500).json({
       message: "Failed to fetch applications",
       error: err.message
